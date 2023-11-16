@@ -22,13 +22,12 @@ def clean_val_path(subj_path, gate):
 def unito_gate(x_axis, y_axis, gate, path_raw, num_workers, device, seq = False, gate_pre = None):
 
   # in sequential predicting, the path_raw is the path for prediction of last gate
-  PATH = os.path.join(f'./model/{gate}_model_{0}.pt')
+  PATH = os.path.join(f'/service/data/input/{gate}_model_{0}.pt')
   model = UNET().to(device)
   model.load_state_dict(torch.load(PATH))
   model.eval()
   model.to(device)
 
-  torch.save(model.state_dict(), f'./model/{gate}_model_{0}.pt')
 
   test_transforms = A.Compose(
       [
