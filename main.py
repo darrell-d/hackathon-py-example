@@ -238,7 +238,7 @@ def mask_to_gate(y_list, pred_list, x_list, subj_list, x_axis, y_axis, gate, gat
   data_df_pred = get_pred_label(raw_table, x_axis, y_axis, mask_pred, gate, gate_pre, seq)
   # if '09.T1_Normalized' in subj_path:
   #   print('true')
-  data_df_pred.to_csv(os.path.join(f'/service/data/output/1/prediction/' + subj_path + '.csv'))
+  data_df_pred.to_csv(os.path.join(f'{sys.argv[2]}/' + subj_path + '.csv'))
 
   data_df_masked = data_df_pred[data_df_pred[gate + '_pred']==1]
 
@@ -248,7 +248,7 @@ def mask_to_gate(y_list, pred_list, x_list, subj_list, x_axis, y_axis, gate, gat
   axs[3].invert_xaxis()
   axs[3].set_title("Reconstructed Mask")
 
-  plt.savefig(os.path.join(f"/service/data/output/1/figures/Figure_{gate}/Train_Val/" + subj_path + ".png"))
+  plt.savefig(os.path.join(f"{sys.argv[2]}/Figure_{gate}/Train_Val/" + subj_path + ".png"))
 
   return data_df_pred, subj_path
 
@@ -351,10 +351,10 @@ def matrix_plot(data_df_selected, x_axis, y_axis, pad_number = 100):
 
     return df_plot
 
-def export_matrix(file_name, x_axis, y_axis, gate_pre, gate, seq = False, raw_path = "/service/data/input/"):
+def export_matrix(file_name, x_axis, y_axis, gate_pre, gate, seq = False, raw_path = sys.argv[1]):
 
     if seq:
-        data_df = pd.read_csv(os.path.join(f'/service/data/output/1/prediction/', file_name))
+        data_df = pd.read_csv(os.path.join(f'{sys.argv[2]}/', file_name))
         data_df = data_df[data_df[gate_pre + '_pred']==1]
     else:
         data_df = pd.read_csv(os.path.join(raw_path, file_name))
@@ -399,7 +399,7 @@ def process_table(x_axis, y_axis, gate_pre, gate, seq = False):
         os.mkdir(f"./Data/Data_{gate}/Raw_PNG")
 
     # assign directory
-    directory = "/service/data/input/"
+    directory = sys.argv[1]
     # iterate over files in
     # that directory
     # extract baseline timepoint
@@ -530,7 +530,7 @@ def clean_val_path(subj_path, gate):
 def unito_gate(x_axis, y_axis, gate, path_raw, num_workers, device, seq = False, gate_pre = None):
 
   # in sequential predicting, the path_raw is the path for prediction of last gate
-  PATH = os.path.join(f'/service/data/input/{gate}_model_{0}.pt')
+  PATH = os.path.join(f'{sys.argv[1]}/{gate}_model_{0}.pt')
   model = UNET().to(device)
   model.load_state_dict(torch.load(PATH))
   model.eval()
@@ -549,10 +549,10 @@ def unito_gate(x_axis, y_axis, gate, path_raw, num_workers, device, seq = False,
 
   val_list, y_val_list, x_list, subj_list = predict_visualization(val_loader, model, device)
 
-  if not os.path.exists(f"/service/data/output/1/figures/Figure_{gate}"):
-    os.mkdir(f"/service/data/output/1/figures/Figure_{gate}")
-  if not os.path.exists(f"/service/data/output/1/figures/Figure_{gate}/Train_Val"):
-    os.mkdir(f"/service/data/output/1/figures/Figure_{gate}/Train_Val")
+  if not os.path.exists(f"{sys.argv[2]}/Figure_{gate}"):
+    os.mkdir(f"{sys.argv[2]}/Figure_{gate}")
+  if not os.path.exists(f"{sys.argv[2]}/Figure_{gate}/Train_Val"):
+    os.mkdir(f"{sys.argv[2]}/Figure_{gate}/Train_Val")
 
   for ind in range(path_val.shape[0]):
 
@@ -576,7 +576,7 @@ def plot_one(gate1, gate2, x_axis2, y_axis2, subject):
     substring = ".npy"
     subject = subject.split(substring)[0]
     
-    data_table = pd.read_csv(f'/service/data/input/{subject}')
+    data_table = pd.read_csv(f'{sys.argv[1]}/{subject}')
     fig, ax = plt.subplots(1, 2, figsize=(16, 8))
 
     ###########################################################
@@ -637,7 +637,7 @@ def plot_one(gate1, gate2, x_axis2, y_axis2, subject):
         gate1_pred = gate1 + '_pred'
     gate2_pred = gate2 + '_pred'
 
-    data_table = pd.read_csv(f'/service/data/output/1/prediction/{subject}')
+    data_table = pd.read_csv(f'{sys.argv[2]}/{subject}')
 
     data = data_table.copy()
     if gate1 != None:
@@ -682,12 +682,12 @@ def plot_one(gate1, gate2, x_axis2, y_axis2, subject):
 
     # save figure
     # plt.savefig(f'./figures/Figure_{gate2}/Recon/Recon_Sequential_{subject}.png')
-    plt.savefig(f'/service/data/output/1/figures/Figure_{gate2}/Recon/Recon_Sequential_{gate2}_{subject}.png')
+    plt.savefig(f'{sys.argv[2]}/Figure_{gate2}/Recon/Recon_Sequential_{gate2}_{subject}.png')
     plt.close()
 
 def plot_all(gate1, gate2, x_axis2, y_axis2):
-    if not os.path.exists(f"/service/data/output/1/figures/Figure_{gate2}/Recon"):
-        os.mkdir(f"/service/data/output/1/figures/Figure_{gate2}/Recon")
+    if not os.path.exists(f"{sys.argv[2]}/Figure_{gate2}/Recon"):
+        os.mkdir(f"{sys.argv[2]}/Figure_{gate2}/Recon")
 
     path_val = pd.read_csv(f"./Data/Data_{gate2}/Train_Test_Val/subj_list.csv")
     # find path for raw tabular data
@@ -698,6 +698,7 @@ def plot_all(gate1, gate2, x_axis2, y_axis2):
 
 import os
 import warnings
+import sys
 warnings.filterwarnings("ignore")
 
 # setting gates
@@ -705,10 +706,10 @@ gate_pre_list = [None, 'gate1_ir', 'gate2_cd45', 'gate2_cd45']
 gate_list = ['gate1_ir', 'gate2_cd45', 'granulocyte', 'lymphocyte']
 x_axis_list = ['Ir191Di___191Ir_DNA1', 'Ir193Di___193Ir_DNA2', 'Yb172Di___172Yb_CD66b', 'Yb172Di___172Yb_CD66b']
 y_axis_list = ['Event_length', 'Y89Di___89Y_CD45', 'Y89Di___89Y_CD45', 'Y89Di___89Y_CD45']
-path2_lastgate_pred_list = ['/service/data/input/', 
-                    '/service/data/output/1/prediction/',
-                    '/service/data/output/1/prediction/',
-                    '/service/data/output/1/prediction/',]
+path2_lastgate_pred_list = [sys.argv[1], 
+                    {sys.argv[2]},
+                    {sys.argv[2]},
+                    {sys.argv[2]},]
 
 # hyperparameter
 device = 'cpu'
@@ -717,10 +718,10 @@ n_worker = 0
 # make directory
 if not os.path.exists(f'./Data'):
     os.mkdir(f"./Data")
-if not os.path.exists(f'/service/data/output/1/figures'):
-    os.mkdir(f"/service/data/output/1/figures")
-if not os.path.exists(f'/service/data/output/1/prediction'):
-    os.mkdir(f"/service/data/output/1/prediction")
+if not os.path.exists(sys.argv[2]):
+    os.mkdir(sys.argv[2])
+if not os.path.exists(sys.argv[2]):
+    os.mkdir(sys.argv[1])
     
 # ###########################################################
 # # UNITO
