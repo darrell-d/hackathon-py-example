@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.2.1
+FROM python:3.8.13
 
 WORKDIR /service
 
@@ -30,8 +30,8 @@ RUN  rm -rf /usr/local/go && tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
 
 ENV PATH="${PATH}:/usr/local/go/bin"
 
-RUN apt-get install software-properties-common && add-apt-repository ppa:deadsnakes/ppa && sudo apt-get update & apt-get -y install python3.8
-RUN python3.8 --version
+# RUN apt-get install software-properties-common && add-apt-repository ppa:deadsnakes/ppa && sudo apt-get update & apt-get -y install python3.8
+# RUN python3.8 --version
 
 # cleanup
 RUN rm -f go1.21.0.linux-amd64.tar.gz
@@ -45,5 +45,8 @@ RUN go build -o /service/main main.go
 RUN mkdir -p data
 
 # Add additional dependencies below ...
+
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+RUN pip install -r /service/requirements.txt
 
 ENTRYPOINT [ "/service/main" ]
