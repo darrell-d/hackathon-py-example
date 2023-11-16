@@ -37,7 +37,7 @@ def matrix_plot(data_df_selected, x_axis, y_axis, pad_number = 100):
 def export_matrix(file_name, x_axis, y_axis, gate_pre, gate, seq = False, raw_path = "./Raw_Data/"):
 
     if seq:
-        data_df = pd.read_csv(os.path.join(f'./prediction/', file_name))
+        data_df = pd.read_csv(os.path.join(f'/service/data/output/1/prediction/', file_name))
         data_df = data_df[data_df[gate_pre + '_pred']==1]
     else:
         data_df = pd.read_csv(os.path.join(raw_path, file_name))
