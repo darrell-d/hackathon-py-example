@@ -3,6 +3,7 @@ import os
 from PIL import Image
 from torch.utils.data import Dataset
 import numpy as np
+import sys
 
 class dataset(Dataset):
   def __init__(self, data_dir, transform=None):
@@ -193,6 +194,7 @@ def get_pred_label(data_df, x_axis, y_axis, mask, gate, gate_pre=None, seq=False
 
 
 def mask_to_gate(y_list, pred_list, x_list, subj_list, x_axis, y_axis, gate, gate_pre, path_raw, worker = 0, idx = 0, seq = False):
+  import sys
   raw_img = x_list[worker][idx]
   mask_img = y_list[worker][idx]
   mask_pred = pred_list[worker][idx]
@@ -228,7 +230,7 @@ def mask_to_gate(y_list, pred_list, x_list, subj_list, x_axis, y_axis, gate, gat
   substring = ".csv.npy"
   subj_path = subj_path.split(substring)[0]
 
-  raw_table = pd.read_csv(path_raw + subj_path + '.csv')
+  raw_table = pd.read_csv(path_raw + '/' + subj_path + '.csv')
   # # remove data point less than 0
   # raw_table = raw_table[raw_table[x_axis] > 0]  
   # raw_table = raw_table[raw_table[y_axis] > 0]  
